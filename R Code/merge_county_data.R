@@ -17,6 +17,7 @@ source('hwXgrid.R')
 NY_Covid <- read_csv('New_York_State_Statewide_COVID-19_Testing.csv')
 Census <- read_csv('All US County Areas (2).csv')
 
+
 nams
 # remove blanks in the names
 colnames(NY_Covid) <- c('Test_Date','County','New_Positive',
