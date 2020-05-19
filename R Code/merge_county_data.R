@@ -79,121 +79,73 @@ NY_May_14.lm <- lm(data = NY_May_14, Cumulative_Positive ~ I(Pop_est/1000))
 summary(NY_May_14.lm)
 
 detach(NY_May_14)
- 
-# 3. Select the 2019 census population estimates
-#    a two other variables for possible use 
-#    in data exploration   
-#
-#    We  know that infection involves contact with the
-#    virus.  
-#
-#    Still, population statistics may be secondarilly
-#    related to human behavior that modifies contact
-#    and death probabilities.  For example  
-#    birth and deaths can be related to age distributions.
-#    
-#    In-migration may be related local population clusters
-    
 
-census_vars  <- select(VA_cty_stats,
-            FIPS,Ctyname,PopEst,Births,Deaths)
+#NEXT SECTION
+n_county <- 20
+ngrp <- 1
+grpSize <- 19 
 
-# Remove the Virgina State total row 
+attach(NY_May_14)
+may <- select(NY_May_14, Test_Date, County, Cumulative_Positive, Pop_est)
+colnames(may) <- c('May_date', 'County', 'Cumulative_Positive', 'Pop_est')
+mayTop <- may %>% arrange(desc(Cumulative_Positive)) %>%
+  slice(1:n_county) 
 
-census_vars <- filter(census_vars,FIPS>0) 
+mayTop <- mayTop %>% mutate(mayrate = 100 * Cumulative_Positive/Pop_est)
+detach(NY_May_14)
 
-# Turn the 3 digit into the full 5 digit fips code
+attach(NY_April_14)
+april <- select(NY_April_14, Test_Date, County, Cumulative_Positive, Pop_est)
+colnames(may) <- c('April_date', 'County', 'Cumulative_Positive', 'Pop_est')
 
-census_vars <- mutate(census_vars,FIPS=FIPS+51000)
-View(census_vars)
+aprilTop <- april %>% arrange(desc(Cumulative_Positive)) %>%
+  slice(1:n_county) 
 
-# 4. Joining tibbles
+aprilTop <- aprilTop %>% mutate(aprilrate = 100 * Cumulative_Positive/Pop_est)
+detach(NY_April_14)
 
-#  This is the simplest join situation.
-#  There is a 1 to 1 match between the 
-#  sorted FIPS codes in the two tibbles.
-#
-#  We can use the inner_join function.
-#  It will address the sorting. 
+may_april <- inner_join(aprilTop, mayTop, by = 'County')
+view(may_april)
 
-mar28_cen <- inner_join(mar28,census_vars,by='FIPS')
-View(mar28_cen)
-
-colnames(mar28_cen)
-
-# We could remove some columns and reorganize
-# the remainder.
-
-# 5. Produce case count plots versus population
-
-# 5.1 Plot cases versus population and a fitted line 
-
-ggplot(mar28_cen,aes(x=PopEst/1000,y=Total_Cases))+
-  geom_point(shape=21,fill='red',color='black',size=3)+
-  geom_smooth(method = 'lm',color='blue',size=1.7) +
-  labs(x='Population in Thousands',
-       y='Number of COVID-19 Cases',
-       title='Virginia Counties and Independent Cities',
-       caption='March 28, 2019') + 
-  hwXgrid
-
-# 5.2 Repeat but with a loess smooth 
-
-ggplot(mar28_cen,aes(x=PopEst/1000,y=Total_Cases))+
-  geom_point(shape=21,fill='red',color='black',size=3)+
-  geom_smooth(color='blue',size=1.7) +
-  labs(x='Population in Thousands',
-       y='Number of COVID-19 Cases',
-       title='Virginia Counties and Independent Cities',
-       caption='March 28, 2019') + 
-  hwXgrid
+may_april_top <-
+  may_april %>%
+  arrange(desc(may_april$mayrate)) %>%
+  slice(1:n_county) %>%
+  select(County,aprilrate,mayrate)
 
 
-# 6. Repeat but with Y as the percent of the population
+grp <- paste0('G',1:ngrp)
+grp <- factor(rep(rep(grp,each=grpSize),1),levels=grp)
+grpCol= paste0("C",1:grpSize)
+grpCol= factor(rep(rep(grpCol,ngrp),1),levels=grpCol)
+may_april_top <- may_april_top %>%
+  mutate(grp= grp,
+         grpCol= grpCol)
 
-plt <- ggplot(mar28_cen,aes(x=PopEst/1000,y=100*Total_Cases/PopEst))+
-  geom_point(shape=21,fill='red',color='black',size=3) +
-  labs(x='Population in Thousands',
-       y='Percent COVID-19 Cases',
-       title='Virginia Counties and Independent Cities',
-       caption='March 28, 2019') + 
-  hwXgrid
+datLab <- 'May 15'
+txt <- paste("New York's Highest",n_county,"Case Rate Counties on",
+             datLab)
+subtext <-'April 14 to May 14,2020'
+
+attach(may_april_top)
+plt <- ggplot(may_april_top,
+              aes(x=aprilrate,
+                  xend=mayrate,
+                  y=County,
+                  yend=County,
+                  group=grp,
+                  color=grpCol)) +
+  geom_segment(
+    arrow =arrow(length=unit(.2,'cm'),
+                 ends='last',type='open'),size=2.5) +
+  geom_segment(size=.6,color='white')+
+  hw + theme(legend.position = 'none',
+             strip.text.y=element_blank())+
+  labs(x='Count Totals Per 100,000',
+       y='',
+       title=txt,
+       subtitle=subtext,
+       caption='Data from NYC HD')
 plt
 
-# 6.1 Find high percent points  and add names
 
-# Compute percents
-
-check <- mutate(mar28_cen,
-                percent=100*Total_Cases/PopEst)
-
-# Find high percent rows
-nams <- filter(check,percent >.024)
-nams
-
-# Add and nudge text
-
-plt + geom_text(aes(x=PopEst/1000,y=percent,
-                 label=Locality),data = nams,
-                 nudge_y=.0035,
-                 nudge_x=0)
-
-# 7. Some Loose ends
-
-#  Some census file edits could be done once saved to a file.
-#  The file could save in an .RData file rather the a csv file.  
-#  
-#  Our perception of what is close for perceptual grouping
-#  is based on distance. However the nudging distance
-#  is function of plot size. Our nudging values  
-#
-#  The two word labels are inconsistent: PopEst and Total_Cases
-#
-#  Variable names could be revised for less typing
-#
-#  The case count for different day cold kept in one tibble
-#  Graphics can show chance over time.  Consider use temporal change 
-#  maps
-
-
-      
