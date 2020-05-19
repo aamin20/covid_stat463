@@ -55,6 +55,9 @@ ggplot(NY_April_14,aes(x = Pop_est/1000,y = Cumulative_Positive),label=County)+
        title= title_text,
        subtitle=subtitle_text) + 
   hwXgrid
+
+NY_April_14.lm <- lm(data = NY_April_14, Cumulative_Positive ~ I(Pop_est/1000))
+Summary(NY_April_14.lm)
  
 # 3. Select the 2019 census population estimates
 #    a two other variables for possible use 
