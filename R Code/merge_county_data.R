@@ -149,7 +149,7 @@ plt <- ggplot(may_april_top,
 plt
 
 #USA 
-USA_Covid <- read.csv('../Data/COVID19STATEDATA.csv')
+USA_Covid <- read_tsv('../Data/COVID19STATEDATA.csv')
 USA_lung_cancer <- read.csv('../Data/US_lungcancer_2016.csv')
 USA_smoking <- read.csv('../Data/US_Cigarette_2017.csv')
 USA_obesity <- read_tsv('../Data/obesity_rate_USA.csv')
@@ -181,16 +181,34 @@ USA_Covid$State <- as.character(USA_Covid$State)
 USA_obesity$State <- as.character(USA_obesity$State)
 
 US_joined <- inner_join(USA_state, USA_Covid, by = 'State')
-US_joined <- inner_join(USA_obesity, USA_smoking, by = 'State')
-US_joined
-US_joined <- inner_join(US_joined, USA_state, by = 'State')
-US_joined
+US_joined <- inner_join(US_joined, USA_smoking, by = 'State')
+US_joined <- inner_join(US_joined, USA_obesity, by = 'State')
+
 attach(US_joined)
 US_joined <- US_joined %>% mutate(count_obesity = Rate_obs/100 * Population)
 US_joined <- US_joined %>% mutate(count_smoking = Rate_smk/100 * Population)
 US_joined <- US_joined %>% mutate(count_obesity = Rate_obs/100 * Population)
 US_joined <- US_joined %>% mutate(count_obesity = Rate_obs/100 * Population)
+US_joined <- US_joined %>% mutate(count_obesity_thousands = count_obesity/1000)
+US_joined <- US_joined %>% mutate(count_smoking_thousands = count_smoking/1000)
 
+#Smokers vs Covid +
+US_joined
+attach(US_joined)
+title_text <- 'US State Smoker Counts (in thousands) and COVID-19 Positive Cases for states'
+subtitle_text <- 'April 14, 2020'
 
+ggplot(US_joined,aes(x = count_smoking_thousands,y = Covid_positive),label=State)+
+  geom_point(shape=21,fill='red',color='black',size=3)+
+  geom_text(aes(label=ifelse(Covid_positive>5000,as.character(State),'')),hjust=0,vjust=0) +
+  geom_smooth(method = 'lm',color='blue',size=1.7) +
+  labs(x='State Smoker Counts in Thousands',
+       y='Number of COVID-19 Positive Cases',
+       title= title_text,
+       subtitle=subtitle_text) + 
+  hwXgrid
+
+NY_April_14.lm <- lm(data = NY_April_14, Cumulative_Positive ~ I(Pop_est/1000))
+Summary(NY_April_14.lm)
 
 
