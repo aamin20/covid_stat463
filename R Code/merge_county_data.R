@@ -148,4 +148,7 @@ plt <- ggplot(may_april_top,
        caption='Data from NYC HD')
 plt
 
+#USA 
+USA_Covid
+
 
