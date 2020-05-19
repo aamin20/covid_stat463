@@ -1,8 +1,6 @@
-# Compute covid-19 cases per 100,000
-# plot versus other variables
-
+#Ahmad Amin / Emily Litzenberg
 #0. Setup
-install.packages('fuzzyjoin')
+
 library(tidyverse)
 source('hw.R')
 source('hwXgrid.R')
@@ -34,14 +32,14 @@ Census$FIPS <- as.numeric(Census$FIPS)
 NY_joined <- inner_join(NY_joined, Census, by = 'FIPS')
 view(NY_joined)
 
-
+#5 get april and may data
 NY_May_14 <- NY_joined[grep("5/14/2020",NY_joined$Test_Date),]
 NY_April_14 <- NY_joined[grep("4/14/2020", NY_joined$Test_Date),]
 
 view(NY_May_14)
 view(NY_April_14)
 
-
+#6 plot april data for NY
 attach(NY_April_14)
 title_text <- 'NY County Populations (in thousands) and COVID-19 Positive Cases'
 subtitle_text <- 'April 14, 2020'
@@ -61,6 +59,7 @@ Summary(NY_April_14.lm)
 
 detach(NY_April_14)
 
+#7 plot may data for NY
 attach(NY_May_14)
 title_text <- 'NY County Populations (in thousands) and COVID-19 Positive Cases'
 subtitle_text <- 'May 14, 2020'
@@ -80,7 +79,7 @@ summary(NY_May_14.lm)
 
 detach(NY_May_14)
 
-#NEXT SECTION
+#8 Compare April and May data for NY
 n_county <- 20
 ngrp <- 1
 grpSize <- 19 
@@ -147,15 +146,15 @@ plt <- ggplot(may_april_top,
        subtitle=subtext,
        caption='Data from NYC HD')
 plt
-
-#USA 
+#----------------------------------------------------------------------------------------
+#9 USA overall all states data
 USA_Covid <- read.csv('../Data/us-states.csv')
 USA_lung_cancer <- read.csv('../Data/US_lungcancer_2016.csv')
 USA_smoking <- read.csv('../Data/US_Cigarette_2017.csv')
 USA_obesity <- read_tsv('../Data/obesity_rate_USA.csv')
 USA_state <- read.csv('../Data/USgeneralpopulation.csv')
 
-
+#select only relevant variables
 attach(USA_state)
 USA_state <- select(USA_state, 'NAME', 'POPESTIMATE2019')
 detach(USA_state)
@@ -169,21 +168,23 @@ attach(USA_smoking)
 USA_smoking <- select(USA_smoking, x = 1 :2 )
 detach(USA_smoking)
 
-
+#rename
 colnames(USA_smoking) = c('State','Rate_smk')
 colnames(USA_obesity) = c('State','Rate_obs')
 colnames(USA_Covid) = c('State', 'Covid_positive')
 colnames(USA_state) = c('State', 'Population')
 
+#refactor
 USA_smoking$State <- as.character(USA_smoking$State)
 USA_state$State <- as.character(USA_state$State)
 USA_Covid$State <- as.character(USA_Covid$State)
 USA_obesity$State <- as.character(USA_obesity$State)
-
+#join into one big table
 US_joined <- inner_join(USA_state, USA_Covid, by = 'State')
 US_joined <- inner_join(US_joined, USA_smoking, by = 'State')
 US_joined <- inner_join(US_joined, USA_obesity, by = 'State')
 
+#mutate new columns from old ones to convert rates to counts
 attach(US_joined)
 US_joined <- US_joined %>% mutate(count_obesity = Rate_obs/100 * Population)
 US_joined <- US_joined %>% mutate(count_smoking = Rate_smk/100 * Population)
@@ -192,7 +193,7 @@ US_joined <- US_joined %>% mutate(count_obesity = Rate_obs/100 * Population)
 US_joined <- US_joined %>% mutate(count_obesity_thousands = count_obesity/1000)
 US_joined <- US_joined %>% mutate(count_smoking_thousands = count_smoking/1000)
 
-#Smokers vs Covid +
+#Smokers vs Covid 
 view(US_joined)
 attach(US_joined)
 title_text <- 'US State Smoker Counts (in thousands) and COVID-19 Positive Cases for states'
@@ -209,7 +210,7 @@ ggplot(US_joined,aes(x = count_smoking_thousands,y = Covid_positive),label=State
 US_Smoker_covid.lm <- lm(data = US_joined, Covid_positive ~ count_smoking_thousands)
 summary(US_Smoker_covid.lm)
 
-
+#obese vs covid
 title_text <- 'US State Obesity Counts (in thousands) and COVID-19 Positive Cases for states'
 
 ggplot(US_joined,aes(x = count_obesity_thousands,y = Covid_positive),label=State)+
