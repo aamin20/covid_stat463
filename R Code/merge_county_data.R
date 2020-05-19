@@ -175,8 +175,22 @@ colnames(USA_obesity) = c('State','Rate_obs')
 colnames(USA_Covid) = c('State', 'Covid_positive')
 colnames(USA_state) = c('State', 'Population')
 
+USA_smoking$State <- as.character(USA_smoking$State)
+USA_state$State <- as.character(USA_state$State)
+USA_Covid$State <- as.character(USA_Covid$State)
+USA_obesity$State <- as.character(USA_obesity$State)
 
-US_joined <- inner_join(USA_Covid, USA_smoking, by = 'State')
-US_joined <- inner_join(USA_obesity, USA_Covid, by = 'State')
+
+US_joined <- inner_join(USA_obesity, USA_smoking, by = 'State')
+US_joined
+US_joined <- inner_join(US_joined, USA_state, by = 'State')
+US_joined
+attach(US_joined)
+US_joined <- US_joined %>% mutate(count_obesity = Rate_obs/100 * Population)
+US_joined <- US_joined %>% mutate(count_smoking = Rate_smk/100 * Population)
+US_joined <- US_joined %>% mutate(count_obesity = Rate_obs/100 * Population)
+US_joined <- US_joined %>% mutate(count_obesity = Rate_obs/100 * Population)
+
+
 US_joined <- inner_join(USA_state, USA_Covid, by = 'State')
 
