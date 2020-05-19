@@ -149,7 +149,7 @@ plt <- ggplot(may_april_top,
 plt
 
 #USA 
-USA_Covid <- read_tsv('../Data/COVID19STATEDATA.csv')
+USA_Covid <- read.csv('../Data/us-states.csv')
 USA_lung_cancer <- read.csv('../Data/US_lungcancer_2016.csv')
 USA_smoking <- read.csv('../Data/US_Cigarette_2017.csv')
 USA_obesity <- read_tsv('../Data/obesity_rate_USA.csv')
@@ -162,7 +162,7 @@ detach(USA_state)
 
 
 attach(USA_Covid)
-USA_Covid <- select(USA_Covid, 'state', 'positive')
+USA_Covid <- select(USA_Covid, 'state', 'cases')
 detach(USA_Covid)
 
 attach(USA_smoking)
@@ -193,22 +193,33 @@ US_joined <- US_joined %>% mutate(count_obesity_thousands = count_obesity/1000)
 US_joined <- US_joined %>% mutate(count_smoking_thousands = count_smoking/1000)
 
 #Smokers vs Covid +
-US_joined
+view(US_joined)
 attach(US_joined)
 title_text <- 'US State Smoker Counts (in thousands) and COVID-19 Positive Cases for states'
-subtitle_text <- 'April 14, 2020'
 
 ggplot(US_joined,aes(x = count_smoking_thousands,y = Covid_positive),label=State)+
   geom_point(shape=21,fill='red',color='black',size=3)+
-  geom_text(aes(label=ifelse(Covid_positive>5000,as.character(State),'')),hjust=0,vjust=0) +
+  geom_text(aes(label=ifelse(Covid_positive>40000,as.character(State),'')),hjust=0,vjust=0) +
   geom_smooth(method = 'lm',color='blue',size=1.7) +
   labs(x='State Smoker Counts in Thousands',
        y='Number of COVID-19 Positive Cases',
-       title= title_text,
-       subtitle=subtitle_text) + 
+       title= title_text)+ 
   hwXgrid
 
-NY_April_14.lm <- lm(data = NY_April_14, Cumulative_Positive ~ I(Pop_est/1000))
-Summary(NY_April_14.lm)
+US_Smoker_covid.lm <- lm(data = US_joined, Covid_positive ~ count_smoking_thousands)
+summary(US_Smoker_covid.lm)
 
 
+title_text <- 'US State Obesity Counts (in thousands) and COVID-19 Positive Cases for states'
+
+ggplot(US_joined,aes(x = count_obesity_thousands,y = Covid_positive),label=State)+
+  geom_point(shape=21,fill='red',color='black',size=3)+
+  geom_text(aes(label=ifelse(Covid_positive>40000,as.character(State),'')),hjust=0,vjust=0) +
+  geom_smooth(method = 'lm',color='blue',size=1.7) +
+  labs(x='State Obesity Counts in Thousands',
+       y='Number of COVID-19 Positive Cases',
+       title= title_text) + 
+  hwXgrid
+
+US_obesity_covid.lm <- lm(data = US_joined, Covid_positive ~ count_obesity_thousands)
+summary(US_obesity_covid.lm)
