@@ -1,0 +1,56 @@
+state,cases,deaths,confirmed_cases,confirmed_deaths,probable_cases,probable_deaths
+Alabama,12086,489,12086,,0,
+Alaska,399,8,399,8,0,0
+Arizona,14170,686,,,,
+Arkansas,4813,100,4813,100,0,0
+California,81911,3322,81911,3322,0,0
+Colorado,22174,1224,,,,
+Connecticut,38116,3449,,,,
+Delaware,7869,297,,,,
+District of Columbia,7270,392,7270,392,0,0
+Florida,46434,1996,46434,1996,0,0
+Georgia,36634,1624,36634,1624,0,0
+Guam,1123,6,1118,6,5,0
+Hawaii,630,17,,,,
+Idaho,2455,74,2254,,201,
+Illinois,96778,4257,96778,4257,0,0
+Indiana,28897,1765,28255,1621,642,144
+Iowa,14955,355,14955,355,0,0
+Kansas,8439,190,,,,
+Kentucky,8041,354,,,,
+Louisiana,34709,2440,34709,2440,0,0
+Maine,1713,71,1713,71,0,0
+Maryland,39882,2023,39762,1903,120,120
+Massachusetts,87052,5862,87052,5862,0,0
+Michigan,51853,4915,51853,,0,
+Minnesota,16381,740,16372,731,9,9
+Mississippi,11432,528,11432,,0,
+Missouri,11224,611,11224,611,0,0
+Montana,470,16,470,16,0,0
+Nebraska,10625,132,10625,132,0,0
+Nevada,7060,358,7058,358,2,0
+New Hampshire,3652,172,3652,172,0,0
+New Jersey,148039,10435,148039,10435,0,0
+New Mexico,6096,270,6096,270,0,0
+New York,356278,28302,351455,23479,4823,4823
+North Carolina,19121,684,19121,684,0,0
+North Dakota,1931,44,1931,44,0,0
+Northern Mariana Islands,21,2,21,2,0,0
+Ohio,28455,1657,,,,
+Oklahoma,5398,288,5398,288,0,0
+Oregon,3687,138,3604,138,83,0
+Pennsylvania,66676,4530,,,,
+Puerto Rico,2710,124,1195,60,1515,64
+Rhode Island,12795,506,12795,506,0,0
+South Carolina,8942,391,8942,391,0,0
+South Dakota,4027,44,4027,44,0,0
+Tennessee,17767,296,17657,296,110,0
+Texas,49786,1362,49682,1362,104,0
+Utah,7384,80,7384,80,0,0
+Vermont,940,54,940,54,0,0
+Virgin Islands,69,6,69,6,0,0
+Virginia,31140,1014,,,,
+Washington,19838,1020,18905,1020,933,0
+West Virginia,1502,68,1502,68,0,0
+Wisconsin,12722,459,12722,459,0,0
+Wyoming,766,10,577,,189,
