@@ -4,23 +4,20 @@
 #0. Setup
 install.packages('fuzzyjoin')
 library(tidyverse)
-library(fuzzyjoin)
 source('hw.R')
 source('hwXgrid.R')
 
-# 1. Read the files 
-
-# The file name have the download date.
-# A column has report data the is
-# normally the previous day
-
+# 1. Read the NY Covid and NY State Census Files (Current version = 2019)
 NY_Covid <- read_csv('../Data/New_York_State_Statewide_COVID-19_Testing.csv')
 NY_Census <- read_csv('../Data/NY_Counties_2019.csv')
+
+# 2. Read US Census data by county (For square area of each county)
 Census <- read_csv('../Data/US_County_Areas.csv')
 
 view(NY_Covid)
 view(NY_Census)
 
+# 3. Rename column names to set up for joins
 # remove blanks in the names
 colnames(NY_Covid) <- c('Test_Date','County','New_Positive',
                         'Cumulative_Positive','New_Tests', 'Cumulative_Tests')
@@ -29,7 +26,12 @@ colnames(NY_Census) <- c('FIPS', 'St_name', 'County',	'Pop_est',
                           'Internat_mig',	'Domestic_mig',	'Net_mig', 'Residual',	'GQ_estimate',	'R_birth',
                          'R_Death',	'R_natural_inc',	'R_internat_mig',	'R_domestic_mig',	'R_net_mig')
 
+# 4. Join Covid data with NY Census data and NY County area data 
 NY_joined <- inner_join(NY_Covid, NY_Census, by = 'County')
+#convert census FIPS to numeric for more matching 
+
+Census$FIPS <- as.numeric(Census$FIPS)
+NY_joined <- inner_join(NY_joined, Census, by = 'FIPS')
 view(NY_joined)
 
 
@@ -39,6 +41,20 @@ NY_April_14 <- NY_joined[grep("4/14/2020", NY_joined$Test_Date),]
 view(NY_May_14)
 view(NY_April_14)
 
+
+attach(NY_April_14)
+title_text <- 'NY County Populations (in thousands) and COVID-19 Positive Cases'
+subtitle_text <- 'April 14, 2020'
+
+ggplot(NY_April_14,aes(x = Pop_est/1000,y = Cumulative_Positive),label=County)+
+  geom_point(shape=21,fill='red',color='black',size=3)+
+  geom_text(aes(label=ifelse(Cumulative_Positive>10000,as.character(County),'')),hjust=1,vjust=-1) +
+  geom_smooth(method = 'lm',color='blue',size=1.7) +
+  labs(x='Population in Thousands',
+       y='Number of COVID-19 Cases',
+       title= title_text,
+       subtitle=subtitle_text) + 
+  hwXgrid
  
 # 3. Select the 2019 census population estimates
 #    a two other variables for possible use 
