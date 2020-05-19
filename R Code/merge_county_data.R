@@ -149,6 +149,34 @@ plt <- ggplot(may_april_top,
 plt
 
 #USA 
-USA_Covid
+USA_Covid <- read.csv('../Data/COVID19STATEDATA.csv')
+USA_lung_cancer <- read.csv('../Data/US_lungcancer_2016.csv')
+USA_smoking <- read.csv('../Data/US_Cigarette_2017.csv')
+USA_obesity <- read_tsv('../Data/obesity_rate_USA.csv')
+USA_state <- read.csv('../Data/USgeneralpopulation.csv')
 
+
+attach(USA_state)
+USA_state <- select(USA_state, 'NAME', 'POPESTIMATE2019')
+detach(USA_state)
+
+
+attach(USA_Covid)
+USA_Covid <- select(USA_Covid, 'state', 'positive')
+detach(USA_Covid)
+
+attach(USA_smoking)
+USA_smoking <- select(USA_smoking, x = 1 :2 )
+detach(USA_smoking)
+
+
+colnames(USA_smoking) = c('State','Rate_smk')
+colnames(USA_obesity) = c('State','Rate_obs')
+colnames(USA_Covid) = c('State', 'Covid_positive')
+colnames(USA_state) = c('State', 'Population')
+
+
+US_joined <- inner_join(USA_Covid, USA_smoking, by = 'State')
+US_joined <- inner_join(USA_obesity, USA_Covid, by = 'State')
+US_joined <- inner_join(USA_state, USA_Covid, by = 'State')
 
