@@ -2,9 +2,9 @@
 # plot versus other variables
 
 #0. Setup
-
+install.packages('fuzzyjoin')
 library(tidyverse)
-library(datasets)
+library(fuzzyjoin)
 source('hw.R')
 source('hwXgrid.R')
 
@@ -14,60 +14,30 @@ source('hwXgrid.R')
 # A column has report data the is
 # normally the previous day
 
-NY_Covid <- read_csv('New_York_State_Statewide_COVID-19_Testing.csv')
-Census <- read_csv('All US County Areas (2).csv')
+NY_Covid <- read_csv('../Data/New_York_State_Statewide_COVID-19_Testing.csv')
+NY_Census <- read_csv('../Data/NY_Counties_2019.csv')
+Census <- read_csv('../Data/US_County_Areas.csv')
 
-
-nams
-# remove blanks in the names
-colnames(NY_Covid) <- c('Test_Date','County','New_Positive',
-                    'Cumulative_Positive','New_Tests', 'Cumulative_Tests')
-
-NY_May_14 <- NY_Covid[grep("5/14/2020",NY_Covid$Test_Date),]
-view(NY_May_14)
-
-NY_Census <- Census[grep("NY",Census$Areaname),]
+view(NY_Covid)
 view(NY_Census)
 
-VA_cty_stats <- read_csv('VA_Census_2019.csv')
-nams <- colnames(VA_cty_stats)
-nams
+# remove blanks in the names
+colnames(NY_Covid) <- c('Test_Date','County','New_Positive',
+                        'Cumulative_Positive','New_Tests', 'Cumulative_Tests')
+colnames(NY_Census) <- c('FIPS', 'St_name', 'County',	'Pop_est',
+                         'N_pop_change',	'Births',	'Deaths',	'Natural_inc',	
+                          'Internat_mig',	'Domestic_mig',	'Net_mig', 'Residual',	'GQ_estimate',	'R_birth',
+                         'R_Death',	'R_natural_inc',	'R_internat_mig',	'R_domestic_mig',	'R_net_mig')
 
-# 2. Look at the tibbles to join
+NY_joined <- inner_join(NY_Covid, NY_Census, by = 'County')
+view(NY_joined)
 
-View(mar28)
 
-# Notes
-# The Fips code is the Federal Information Processing Standards
-# code that uniquely identified states, and their tax receiving 
-# localities. From most states these are counties.
-# For Virgina there are 95 counties and 38 cities that
-# are referred to independent cities.
+NY_May_14 <- NY_joined[grep("5/14/2020",NY_joined$Test_Date),]
+NY_April_14 <- NY_joined[grep("4/14/2020", NY_joined$Test_Date),]
 
-# In a 5 digit fips code the first two digits
-# indicate the state. Then next three
-# indicate counties or other localities.
-
-View(VA_cty_stats[,1:10])
-
-# Here we see the two leading digit in the State 
-# and the last three digits in a locality column. 
-# This is not going to work for merge the two files
-# Below we will add 51000 to the locality column
-# and rename it FIPS.
-
-# The county three digit numbering convention
-# from long ago started with 1 and used odd numbers.
-# This left many number available for future use.
-# However, over the used counties have rarely
-# split or merged.
-#
-# Scanning down to line 97 we sed the code 510 
-# and the codes below this mostly increment by 10.
-# These correspond to Virginia's Independent cities
-# that gather taxes. People in Fairfax City, which
-# is surrounded, by Fairfax County pay taxes to 
-# Fairfax City and not Fairfax County.
+view(NY_May_14)
+view(NY_April_14)
 
  
 # 3. Select the 2019 census population estimates
