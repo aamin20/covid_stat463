@@ -58,6 +58,27 @@ ggplot(NY_April_14,aes(x = Pop_est/1000,y = Cumulative_Positive),label=County)+
 
 NY_April_14.lm <- lm(data = NY_April_14, Cumulative_Positive ~ I(Pop_est/1000))
 Summary(NY_April_14.lm)
+
+detach(NY_April_14)
+
+attach(NY_May_14)
+title_text <- 'NY County Populations (in thousands) and COVID-19 Positive Cases'
+subtitle_text <- 'May 14, 2020'
+
+ggplot(NY_May_14,aes(x = Pop_est/1000,y = Cumulative_Positive),label=County)+
+  geom_point(shape=21,fill='green',color='black',size=3)+
+  geom_text(aes(label=ifelse(Cumulative_Positive>10000,as.character(County),'')),hjust=1,vjust=-1) +
+  geom_smooth(method = 'lm',color='blue',size=1.7) +
+  labs(x='Population in Thousands',
+       y='Number of COVID-19 Cases',
+       title= title_text,
+       subtitle=subtitle_text) + 
+  hwXgrid
+
+NY_May_14.lm <- lm(data = NY_May_14, Cumulative_Positive ~ I(Pop_est/1000))
+summary(NY_May_14.lm)
+
+detach(NY_May_14)
  
 # 3. Select the 2019 census population estimates
 #    a two other variables for possible use 
